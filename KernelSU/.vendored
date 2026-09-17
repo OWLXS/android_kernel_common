@@ -1,0 +1,1 @@
+Vendored as plain files in the lamu kernel/common fork (not a git submodule -- Kleaf/Bazel sandboxed builds cannot fetch submodules anyway). See drivers/kernelsu/Kbuild, which checks for this file instead of .git.

@@ -59,7 +59,7 @@ GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git
 
 KSU_SRC := /serverhive/themoonx/Axion-Lamu/out-kernel/motorola_lamu/kernel-6.6/KernelSU/kernel
 
-LOCAL_GIT_EXISTS := $(shell test -e $(KSU_SRC)/../.git && echo 1 || echo 0)
+LOCAL_GIT_EXISTS := $(shell test -e $(KSU_SRC)/../.vendored && echo 1 || echo 0)
 
 ifeq ($(LOCAL_GIT_EXISTS),0)
 $(info -- Can't find $(REPO_NAME) git submodule!)
