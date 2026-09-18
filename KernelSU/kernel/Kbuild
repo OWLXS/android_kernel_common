@@ -57,7 +57,14 @@ KDIR := $(KDIR)
 
 GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git
 
-KSU_SRC := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+# Hardcoded absolute host path, not upstreams dynamic
+# $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))) -- that computes
+# a path relative to wherever Kbuild is currently being read from, which
+# inside Bazels hermetic sandbox is some processwrapper-sandbox/N/execroot/...
+# location, not this real path. The hardcoded absolute path still resolves
+# correctly from inside the sandbox (bind-mounted), which the dynamic one
+# does not. Update this if the tree ever moves.
+KSU_SRC := /serverhive/themoonx/Axion-Lamu/out-kernel/motorola_lamu/kernel-6.6/KernelSU/kernel
 
 LOCAL_GIT_EXISTS := $(shell test -e $(KSU_SRC)/../.vendored && echo 1 || echo 0)
 
