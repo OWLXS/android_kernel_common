@@ -57,7 +57,7 @@ KDIR := $(KDIR)
 
 GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git
 
-KSU_SRC := /serverhive/themoonx/Axion-Lamu/out-kernel/motorola_lamu/kernel-6.6/KernelSU/kernel
+KSU_SRC := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 LOCAL_GIT_EXISTS := $(shell test -e $(KSU_SRC)/../.vendored && echo 1 || echo 0)
 
