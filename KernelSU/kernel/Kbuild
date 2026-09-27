@@ -57,13 +57,6 @@ KDIR := $(KDIR)
 
 GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git
 
-# Hardcoded absolute host path, not upstreams dynamic
-# $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))) -- that computes
-# a path relative to wherever Kbuild is currently being read from, which
-# inside Bazels hermetic sandbox is some processwrapper-sandbox/N/execroot/...
-# location, not this real path. The hardcoded absolute path still resolves
-# correctly from inside the sandbox (bind-mounted), which the dynamic one
-# does not. Update this if the tree ever moves.
 KSU_SRC := /serverhive/ephitaphx/KERNEL-LAMU/kernel-6.6/KernelSU/kernel
 
 LOCAL_GIT_EXISTS := $(shell test -e $(KSU_SRC)/../.vendored && echo 1 || echo 0)
@@ -79,19 +72,11 @@ ifdef KBUILD_EXTMOD
 include $(KSU_SRC)/tools/ddk_compatible.mk
 endif
 
-$(shell cd $(KSU_SRC); [ -f ../.git/shallow ] && $(GIT_BIN) fetch --unshallow)
-# KSU_SRC has no .git of its own (vendored as plain files - see .vendored),
-# so every git command below would silently walk up and succeed against
-# THIS fork's own .git instead of failing into the || fallback, returning
-# believable-looking but wrong values (this fork's own commit count/hash,
-# not ReSukiSU's). Hardcoded to match the real upstream state instead of
-# relying on that fallback. Update these two lines by hand next time
-# KernelSU/ is refreshed from https://github.com/ReSukiSU/ReSukiSU.
-KSU_LOCAL_VERSION := 4454
+KSU_LOCAL_VERSION := 4484
 KSU_VERSION := $(shell expr 30000 + $(KSU_LOCAL_VERSION) + 700)
 
-KSU_TAG_NAME    := v4.2.0-rc2
-KSU_COMMIT_SHA  := 6ec8d9a8
+KSU_TAG_NAME    := v4.2.0-rc3
+KSU_COMMIT_SHA  := fa8311f6
 KSU_BRANCH_NAME := main
 
 # call subst to process placeholders
@@ -123,6 +108,10 @@ endif
 else
 KERNEL_TYPE := GKI 2.0
 endif
+
+ifneq ($(shell test $(VERSION) -ge 4; echo $$?),0)
+KERNEL_TYPE := Non-GKI (Legacy)
+endif
 $(info -- KERNEL_VERSION: $(KERNEL_VERSION))
 $(info -- KERNEL_TYPE: $(KERNEL_TYPE))
 
@@ -132,6 +121,8 @@ else ifeq ($(CONFIG_X86_64),y)
   kernelsu-objs += hook/x86_64/patch_memory.o
 else ifeq ($(CONFIG_ARM),y)
   kernelsu-objs += hook/arm32/patch_memory.o
+else ifeq ($(CONFIG_RISCV),y)
+  kernelsu-objs += hook/riscv64/patch_memory.o
 else
   ifeq ($(CONFIG_KSU),y)
     $(info -- Unsupported arch)
@@ -165,6 +156,8 @@ ifdef CONFIG_KSU_TRACEPOINT_HOOK
     kernelsu-objs += hook/arm64/syscall_hook.o
   else ifeq ($(CONFIG_X86_64),y)
     kernelsu-objs += hook/x86_64/syscall_hook.o
+  else ifeq ($(CONFIG_RISCV),y
+    kernelsu-objs += hook/riscv64/syscall_hook.o
   else
     ifeq ($(CONFIG_KSU), y)
       $(info -- Unsupported arch)

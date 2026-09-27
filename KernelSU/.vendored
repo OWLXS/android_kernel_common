@@ -1,1 +1,1 @@
-Vendored as plain files in the lamu kernel/common fork (not a git submodule -- Kleaf/Bazel sandboxed builds cannot fetch submodules anyway). See drivers/kernelsu/Kbuild, which checks for this file instead of .git. Updated 2026-09-18 from ReSukiSU/ReSukiSU upstream.
+Vendored as plain files in the lamu kernel/common fork (not a git submodule -- Kleaf/Bazel sandboxed builds cannot fetch submodules anyway). See drivers/kernelsu/Kbuild, which checks for this file instead of .git. Updated 2026-09-27 from ReSukiSU/ReSukiSU upstream (main, fa8311f6, v4.2.0-rc3).
