@@ -1937,7 +1937,8 @@ extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *ar
 			void *envp, int *flags);
 extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
 				void *envp, int *flags);
-extern int ksu_install_su_fd(void);
+extern int ksu_handle_post_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
+				void *envp, int *flags, int *retval);
 #endif
 
 static int do_execveat_common(int fd, struct filename *filename,
@@ -2036,8 +2037,8 @@ orig_flow:
 
 	retval = bprm_execve(bprm, fd, filename, flags);
 #ifdef CONFIG_KSU_SUSFS
-	if (unlikely(is_su_session && retval >= 0))
-		ksu_install_su_fd();
+	if (unlikely(is_su_session))
+		(void)ksu_handle_post_execveat_sucompat(&fd, &filename, &argv, &envp, &flags, &retval);
 #endif // #ifdef CONFIG_KSU_SUSFS
 out_free:
 	free_bprm(bprm);
